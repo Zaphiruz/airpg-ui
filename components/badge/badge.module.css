@@ -1,0 +1,7 @@
+.badge {
+	padding: 0.15rem 0.45rem;
+	background-color: lightcoral;
+	border-radius: 25px;
+	margin: 0.2rem;
+	white-space: nowrap;
+}
