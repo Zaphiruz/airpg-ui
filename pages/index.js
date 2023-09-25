@@ -1,6 +1,10 @@
 import Head from "next/head";
-import styles from "../styles/Home.module.css";
 import RouterLink from '../components/router-link';
+
+import pageStyles from "../styles/page.module.css";
+import cardStyles from "../styles/card.module.css";
+import gridStyles from "../styles/grid.module.css";
+import footerStyles from "../styles/footer.module.css";
 
 import { titleCase } from '../utils/format';
 
@@ -18,7 +22,7 @@ export const getServerSideProps = async () => {
 
 const makeCard = (collectionName) => (
 	<RouterLink href={`collections/${collectionName}`}
-		className={styles.card}
+		className={cardStyles.card}
 		key={collectionName}
 	>
 		<li>
@@ -30,60 +34,23 @@ const makeCard = (collectionName) => (
 
 export default function Home({ collectionNames }) {
 	return (
-		<div className={styles.container}>
+		<div className={pageStyles.container}>
 			<Head>
 				<title>AI RPG Admin</title>
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
 
-			<main>
-				<h1 className={styles.title}>View and edit collections!</h1>
+			<main className={`${pageStyles.main} ${pageStyles.main_center} ${pageStyles.main_large_padding}`}>
+				<h1 className={pageStyles.title}>View and edit collections!</h1>
 
-				<p className={styles.description}>
+				<p className={pageStyles.description}>
 					Get started by clicking a category below.
 				</p>
 
-				<ul className={styles.grid}>{collectionNames.map(makeCard)}</ul>
+				<ul className={gridStyles.grid}>{collectionNames.map(makeCard)}</ul>
 			</main>
 
-			<footer></footer>
-
-			<style jsx>{`
-				main {
-					padding: 5rem 0;
-					flex: 1;
-					display: flex;
-					flex-direction: column;
-					justify-content: center;
-					align-items: center;
-				}
-				footer {
-					width: 100%;
-					height: 100px;
-					border-top: 1px solid #eaeaea;
-					display: flex;
-					justify-content: center;
-					align-items: center;
-				}
-				footer img {
-					margin-left: 0.5rem;
-				}
-				footer a {
-					display: flex;
-					justify-content: center;
-					align-items: center;
-					text-decoration: none;
-					color: inherit;
-				}
-				code {
-					background: #fafafa;
-					border-radius: 5px;
-					padding: 0.75rem;
-					font-size: 1.1rem;
-					font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
-						DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
-				}
-			`}</style>
+			<footer className={footerStyles.footer}></footer>
 
 			<style jsx global>{`
 				html,
@@ -96,6 +63,14 @@ export default function Home({ collectionNames }) {
 				}
 				* {
 					box-sizing: border-box;
+				}
+				code {
+					background: #fafafa;
+					border-radius: 5px;
+					padding: 0.75rem;
+					font-size: 1.1rem;
+					font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
+						DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
 				}
 			`}</style>
 		</div>
