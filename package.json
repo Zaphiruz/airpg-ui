@@ -1,5 +1,4 @@
 {
-  "private": true,
   "scripts": {
     "build": "next build",
     "dev": "next dev",
@@ -12,5 +11,20 @@
   },
   "engines": {
     "node": ">=18"
-  }
+  },
+  "name": "airpg-ui",
+  "description": "This is a starter template for [Learn Next.js](https://nextjs.org/learn).",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zaphiruz/airpg-ui.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Zaphiruz/airpg-ui/issues"
+  },
+  "homepage": "https://github.com/Zaphiruz/airpg-ui#readme"
 }
