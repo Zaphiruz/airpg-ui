@@ -7,10 +7,10 @@ import gridStyles from "../styles/grid.module.css";
 import footerStyles from "../styles/footer.module.css";
 
 import { titleCase } from '../utils/format';
+import { getCollectionNames } from "../utils/collections-manager";
 
 export const getServerSideProps = async () => {
-	let responce = await fetch("http://127.0.0.1:8080/meta/collectionNames");
-	let collectionNames = await responce.json();
+	let collectionNames = await getCollectionNames();
 
 	return {
 		props: {
@@ -40,7 +40,7 @@ export default function Home({ collectionNames }) {
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
 
-			<main className={`${pageStyles.main} ${pageStyles.main_center} ${pageStyles.main_large_padding}`}>
+			<main className={`${pageStyles.main} ${pageStyles.main_center}`} style={{ padding: "5rem 0" }}>
 				<h1 className={pageStyles.title}>View and edit collections!</h1>
 
 				<p className={pageStyles.description}>

@@ -1,5 +1,6 @@
 .dl {
 	display: flex;
+	justify-content: space-between;
 }
 
 .dl div {

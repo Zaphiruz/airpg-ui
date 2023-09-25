@@ -49,10 +49,6 @@
   flex-direction: column;
 }
 
-.main_large_padding {
-  padding: 5rem 0 !important;
-}
-
 .main_center {
   justify-content: center;
   align-items: center;

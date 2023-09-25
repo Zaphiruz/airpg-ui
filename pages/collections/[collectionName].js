@@ -1,5 +1,8 @@
 import Head from "next/head";
 import Badge from "../../components/badge/badge.index";
+import Button from "@mui/material/Button";
+import EditIcon from "@mui/icons-material/Edit";
+import RemoveItemDialog from "../../components/remove-item-dialog/remove-item-dialog.index";
 
 import cardStyles from "../../styles/card.module.css";
 import pageStyles from "../../styles/page.module.css";
@@ -8,12 +11,10 @@ import listStyles from "../../styles/list.module.css";
 
 import { useRouter } from "next/router";
 import { titleCase } from "../../utils/format";
+import { getCollection, cancelItem } from "../../utils/collections-manager";
 
 export const getServerSideProps = async ({ params }) => {
-	let responce = await fetch(
-		`http://127.0.0.1:8080/api/${params.collectionName}`
-	);
-	let collectionItems = await responce.json();
+	let collectionItems = await getCollection(params.collectionName)
 
 	return {
 		props: {
@@ -22,12 +23,16 @@ export const getServerSideProps = async ({ params }) => {
 	};
 };
 
-const makeBadge = (tag) => (
-  <Badge key={tag}>{tag}</Badge>
-)
-
-export const makeListCard = (item) => (
-	<li key={item._id} className={cardStyles.list_card} >
+export const ListCard = ({item, collectionName, cancelItemCallback}) => (
+	<li
+		key={item._id}
+		className={cardStyles.list_card}
+		style={{ margin: "0.5rem" }}
+	>
+		<div style={{ float: "right" }}>
+			<Button variant="outlined" color='primary' startIcon={<EditIcon />}>Edit</Button>
+			<RemoveItemDialog item={item} collectionName={collectionName} callback={cancelItemCallback}></RemoveItemDialog>
+		</div>
 		<dl className={listStyles.dl}>
 			<div>
 				<dt>Name</dt>
@@ -37,17 +42,26 @@ export const makeListCard = (item) => (
 				<dt>Description</dt>
 				<dd>{item.description}</dd>
 			</div>
-      <div>
-				<dt>Tags</dt>
-        <dd>{item.tags?.map(makeBadge) ?? "None"}</dd>
-			</div>
 		</dl>
+		<div style={{ float: "right" }}>{
+      item.tags?.map((tag) => (
+        <Badge key={`${item._id}-${tag}-tag`}>{tag}</Badge>
+      )) ?? "None"
+    }</div>
 	</li>
 );
 
 export default function Page({ collectionItems }) {
 	const router = useRouter();
 	const collectionName = router.query.collectionName;
+
+  const cancelItemCallback = (collectionName, item) => async (doDelete) => {
+    if (!doDelete) return;
+
+    return cancelItem(collectionName, item).then(() => {
+      return router.reload();
+    })
+  }
 
 	return (
 		<div className={pageStyles.container}>
@@ -67,7 +81,9 @@ export default function Page({ collectionItems }) {
 
 				<section>
 					<ul className={listStyles.ui}>
-						{collectionItems?.map(makeListCard)}
+						{collectionItems?.map(item => (
+              <ListCard key={item._id} item={item} collectionName={collectionName} cancelItemCallback={cancelItemCallback(collectionName, item)}></ListCard>
+            ))}
 					</ul>
 				</section>
 			</main>

@@ -5,6 +5,10 @@
     "start": "next start"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.14.9",
+    "@mui/material": "^5.14.10",
     "next": "latest",
     "react": "18.2.0",
     "react-dom": "18.2.0"
@@ -16,7 +20,6 @@
   "description": "This is a starter template for [Learn Next.js](https://nextjs.org/learn).",
   "version": "1.0.0",
   "main": "index.js",
-  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Zaphiruz/airpg-ui.git"

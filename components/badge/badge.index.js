@@ -2,8 +2,8 @@ import badgeStyles from "./badge.module.css";
 
 import { titleCase } from "../../utils/format";
 
-export const Badge = ({ children, style, className }) => (
-	<span style={style} className={`${badgeStyles.badge} ${className ?? ''}`}>
+export const Badge = ({ children }) => (
+	<span className={badgeStyles.badge}>
 		{titleCase(children)}
 	</span>
 );
