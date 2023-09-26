@@ -78,7 +78,7 @@ export default function Page({ collectionItems: serverCollctionItems }) {
 				setCollectionItems([...collectionItems, newItem]);
 			}
 		});
-	}
+	};
 
 	const searchTags = (tags, collectionName) => {
 		router.replace({
@@ -120,20 +120,27 @@ export default function Page({ collectionItems: serverCollctionItems }) {
 					value={currnetTags}
 					disabled
 				/>
-				<Button
-					variant="outlined"
-					color="secondary"
-					size="small"
-					startIcon={<ClearIcon />}
-					onClick={() => clearTags(collectionName)}
-				>
-					Clear Search
-				</Button>
 
 				<section>
-					<SaveItemModal collectionName={collectionName} callback={saveItemCallback(collectionName)}/>
+					<div
+						className={`${flexStyles.flex} ${flexStyles.space_between} ${flexStyles.centered}`}
+						style={{ marginTop: "1rem" }}
+					>
+						<Button
+							variant="outlined"
+							color="secondary"
+							startIcon={<ClearIcon />}
+							onClick={() => clearTags(collectionName)}
+						>
+							Clear Search
+						</Button>
+						<SaveItemModal
+							collectionName={collectionName}
+							callback={saveItemCallback(collectionName)}
+						/>
+					</div>
 
-					<ul className={listStyles.ui}>
+					<ul className={listStyles.ul}>
 						{collectionItems?.map((item) => (
 							<li
 								key={item._id}
@@ -167,19 +174,24 @@ export default function Page({ collectionItems: serverCollctionItems }) {
 										<dd>{item.description}</dd>
 									</div>
 								</dl>
-								<div className={`${flexStyles.flex} ${flexStyles.end}`}>
-									<Stack direction="row" spacing={1}>
-										{item.tags?.map((tag) => (
-											<Chip
-												key={`${item._id}-${tag}-tag`}
-												label={tag}
-												onClick={() => searchTags(tag, collectionName)}
-												size="small"
-												variant="outlined"
-											/>
-										)) ?? "None"}
-									</Stack>
-								</div>
+								<Stack
+									direction="row"
+									spacing={1}
+									justifyContent="flex-end"
+									alignItems="center"
+									flexWrap="wrap"
+									useFlexGap
+								>
+									{item.tags?.map((tag) => (
+										<Chip
+											key={`${item._id}-${tag}-tag`}
+											label={tag}
+											onClick={() => searchTags(tag, collectionName)}
+											size="small"
+											variant="outlined"
+										/>
+									)) ?? "None"}
+								</Stack>
 							</li>
 						))}
 					</ul>

@@ -5,6 +5,7 @@ import pageStyles from "../styles/page.module.css";
 import cardStyles from "../styles/card.module.css";
 import gridStyles from "../styles/grid.module.css";
 import footerStyles from "../styles/footer.module.css";
+import listStyles from "../styles/list.module.css";
 
 import { titleCase } from '../utils/format';
 import { getCollectionNames } from "../utils/collections-manager";
@@ -47,7 +48,7 @@ export default function Home({ collectionNames }) {
 					Get started by clicking a category below.
 				</p>
 
-				<ul className={gridStyles.grid}>{collectionNames.map(makeCard)}</ul>
+				<ul className={`${listStyles.ul} ${gridStyles.grid}`}>{collectionNames.map(makeCard)}</ul>
 			</main>
 
 			<footer className={footerStyles.footer}></footer>
