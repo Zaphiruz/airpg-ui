@@ -9,6 +9,19 @@ export const cancelItem = async (collectionName, item) => {
 	})
 }
 
+export const editItem = async (collectionName, item, delta) => {
+	console.log("Edit Item", collectionName, item._id, delta)
+	let responce = await fetch(`${host}/api/${collectionName}/${item._id}`, {
+		method: "PUT",
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({
+			...item,
+			...delta
+		})
+	});
+	return responce.json();
+}
+
 export const getCollection = async (collectionName, query) => {
 	console.log("Get Colleciton", collectionName);
 	let responce = await fetch(

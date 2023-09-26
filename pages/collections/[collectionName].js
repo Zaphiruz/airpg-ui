@@ -1,7 +1,8 @@
 import Head from "next/head";
 import Button from "@mui/material/Button";
-import EditIcon from "@mui/icons-material/Edit";
-import RemoveItemDialog from "../../components/remove-item-dialog/remove-item-dialog.index";
+
+import RemoveItemDialog from "../../components/remove-item-dialog";
+import EditItemModal from "../../components/edit-item-modal";
 import SearchBar from "../../components/search-bar";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
@@ -12,9 +13,10 @@ import pageStyles from "../../styles/page.module.css";
 import footerStyles from "../../styles/footer.module.css";
 import listStyles from "../../styles/list.module.css";
 
+import * as React from "react";
 import { useRouter } from "next/router";
 import { titleCase } from "../../utils/format";
-import { getCollection, cancelItem } from "../../utils/collections-manager";
+import { getCollection, cancelItem, editItem } from "../../utils/collections-manager";
 
 export const getServerSideProps = async ({ params, query }) => {
 	let collectionItems = await getCollection(params.collectionName, {
@@ -29,10 +31,13 @@ export const getServerSideProps = async ({ params, query }) => {
 	};
 };
 
-export default function Page({ collectionItems }) {
+export default function Page({ collectionItems: serverCollctionItems }) {
+	const [collectionItems, setCollectionItems] = React.useState(serverCollctionItems);
 	const router = useRouter();
 	const collectionName = router.query.collectionName;
-	const currnetTags = router.query.tags ?? '';
+	const currnetTags = router.query.tags ?? "";
+
+	console.log(collectionItems)
 
 	const cancelItemCallback = (collectionName, item) => async (doDelete) => {
 		if (!doDelete) return;
@@ -41,6 +46,19 @@ export default function Page({ collectionItems }) {
 			return router.reload();
 		});
 	};
+
+	const editItemCallback = (collectionName, item) => async (delta, callback) => {
+		if (!delta) return;
+
+		return editItem(collectionName, item, delta).then((newItem) => {
+			if (newItem) {
+				callback();
+				let shallowClone = [...collectionItems]
+				shallowClone.splice(collectionItems.indexOf(item), 1, newItem)
+				setCollectionItems(shallowClone)
+			}
+		});
+	}
 
 	const searchTags = (tags, collectionName) => {
 		router.replace({
@@ -101,14 +119,11 @@ export default function Page({ collectionItems }) {
 								style={{ margin: "0.5rem" }}
 							>
 								<div style={{ float: "right" }}>
-									<Button
-										variant="outlined"
-										color="primary"
-										size="small"
-										startIcon={<EditIcon />}
-									>
-										Edit
-									</Button>
+									<EditItemModal
+										item={item}
+										collectionName={collectionName}
+										callback={editItemCallback(collectionName, item)}
+									></EditItemModal>
 									<RemoveItemDialog
 										item={item}
 										collectionName={collectionName}

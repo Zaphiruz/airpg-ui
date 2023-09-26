@@ -8,7 +8,6 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 export const RemoveItemDialog = ({
-	children,
 	item,
 	collectionName,
 	callback,

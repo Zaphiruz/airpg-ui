@@ -11,6 +11,7 @@ export default ({ searchCallback, disabled, value }) => (
 			Search
 		</InputLabel>
 		<OutlinedInput
+			id="search-bar"
 			value={value}
 			onChange={searchCallback}
 			inputProps={{
