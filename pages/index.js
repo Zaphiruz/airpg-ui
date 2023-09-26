@@ -1,5 +1,6 @@
 import Head from "next/head";
 import RouterLink from '../components/router-link';
+import MainNav from '../components/main-nav';
 
 import pageStyles from "../styles/page.module.css";
 import cardStyles from "../styles/card.module.css";
@@ -41,10 +42,16 @@ export default function Home({ collectionNames }) {
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
 
+			<MainNav collectionNames={collectionNames} />
+
 			<main className={`${pageStyles.main} ${pageStyles.main_center}`} style={{ padding: "5rem 0" }}>
-				<h1 className={pageStyles.title}>View and edit collections!</h1>
+				<h1 className={pageStyles.title}>AIRPG Admin Interface</h1>
 
 				<p className={pageStyles.description}>
+					Here, you can view, edit, delete, or create collections items!
+				</p>
+
+				<p className={pageStyles.subtext}>
 					Get started by clicking a category below.
 				</p>
 

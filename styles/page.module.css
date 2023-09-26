@@ -29,13 +29,20 @@
 }
 
 .title,
-.description {
+.description,
+.subtext {
   text-align: center;
 }
 
 .description {
   line-height: 1.5;
   font-size: 1.5rem;
+}
+
+.subtext {
+  line-height: 1.2;
+  font-size: 1.25rem;
+  margin-top: 0;
 }
 
 .logo {

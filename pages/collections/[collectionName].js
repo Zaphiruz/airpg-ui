@@ -1,6 +1,6 @@
 import Head from "next/head";
 import Button from "@mui/material/Button";
-
+import MainNav from '../../components/main-nav';
 import RemoveItemDialog from "../../components/remove-item-dialog";
 import EditItemModal from "../../components/edit-item-modal";
 import SaveItemModal from "../../components/save-item-modal";
@@ -25,24 +25,29 @@ import {
 	deleteItem,
 	editItem,
 	saveItem,
+	getCollectionNames,
 } from "../../utils/collections-manager";
 
 export const getServerSideProps = async ({ params, query }) => {
 
-	let collectionItems = await getCollection(params.collectionName, {
+	let collectionNames = getCollectionNames();
+	let collectionItems = getCollection(params.collectionName, {
 		...query,
 		collectionName: undefined,
 	});
 
-	return {
-		props: {
-			collectionName: params.collectionName,
-			collectionItems,
-		},
-	};
+	return Promise.all([collectionNames, collectionItems]).then(([collectionNames, collectionItems]) =>
+		({
+			props: {
+				collectionName: params.collectionName,
+				collectionItems,
+				collectionNames,
+			},
+		})
+	);
 };
 
-export default function Page({collectionItems, collectionName }) {
+export default function Page({collectionItems, collectionName, collectionNames }) {
 	const router = useRouter();
 	const query = Object.fromEntries(useSearchParams().entries());
 	const pathname = usePathname();
@@ -125,7 +130,9 @@ export default function Page({collectionItems, collectionName }) {
 		</dl>
 	)
 
-	return (
+	return (<>
+		<MainNav collectionNames={collectionNames} />
+
 		<div className={pageStyles.container}>
 			<Head>
 				<title>AI RPG {titleCase(collectionName)} Collection</title>
@@ -236,5 +243,5 @@ export default function Page({collectionItems, collectionName }) {
 
 			<footer className={footerStyles.footer}></footer>
 		</div>
-	);
+	</>);
 }
