@@ -11,6 +11,10 @@
 	transition: color 0.15s ease, border-color 0.15s ease;
 }
 
+.list_card {
+	margin: 0;
+}
+
 .card:hover,
 .card:focus,
 .card:active {

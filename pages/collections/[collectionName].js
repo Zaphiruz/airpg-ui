@@ -145,7 +145,6 @@ export default function Page({ collectionItems: serverCollctionItems }) {
 							<li
 								key={item._id}
 								className={cardStyles.list_card}
-								style={{ margin: "0.5rem" }}
 							>
 								<div className={`${flexStyles.flex} ${flexStyles.end}`}>
 									<div style={{ margin: "0 0.25rem" }}>
