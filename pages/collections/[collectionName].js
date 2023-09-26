@@ -12,11 +12,16 @@ import cardStyles from "../../styles/card.module.css";
 import pageStyles from "../../styles/page.module.css";
 import footerStyles from "../../styles/footer.module.css";
 import listStyles from "../../styles/list.module.css";
+import flexStyles from "../../styles/flex.module.css";
 
 import * as React from "react";
 import { useRouter } from "next/router";
 import { titleCase } from "../../utils/format";
-import { getCollection, cancelItem, editItem } from "../../utils/collections-manager";
+import {
+	getCollection,
+	cancelItem,
+	editItem,
+} from "../../utils/collections-manager";
 
 export const getServerSideProps = async ({ params, query }) => {
 	let collectionItems = await getCollection(params.collectionName, {
@@ -32,12 +37,13 @@ export const getServerSideProps = async ({ params, query }) => {
 };
 
 export default function Page({ collectionItems: serverCollctionItems }) {
-	const [collectionItems, setCollectionItems] = React.useState(serverCollctionItems);
+	const [collectionItems, setCollectionItems] =
+		React.useState(serverCollctionItems);
 	const router = useRouter();
 	const collectionName = router.query.collectionName;
 	const currnetTags = router.query.tags ?? "";
 
-	console.log(collectionItems)
+	console.log(collectionItems);
 
 	const cancelItemCallback = (collectionName, item) => async (doDelete) => {
 		if (!doDelete) return;
@@ -47,18 +53,19 @@ export default function Page({ collectionItems: serverCollctionItems }) {
 		});
 	};
 
-	const editItemCallback = (collectionName, item) => async (delta, callback) => {
-		if (!delta) return;
+	const editItemCallback =
+		(collectionName, item) => async (delta, callback) => {
+			if (!delta) return;
 
-		return editItem(collectionName, item, delta).then((newItem) => {
-			if (newItem) {
-				callback();
-				let shallowClone = [...collectionItems]
-				shallowClone.splice(collectionItems.indexOf(item), 1, newItem)
-				setCollectionItems(shallowClone)
-			}
-		});
-	}
+			return editItem(collectionName, item, delta).then((newItem) => {
+				if (newItem) {
+					callback();
+					let shallowClone = [...collectionItems];
+					shallowClone.splice(collectionItems.indexOf(item), 1, newItem);
+					setCollectionItems(shallowClone);
+				}
+			});
+		};
 
 	const searchTags = (tags, collectionName) => {
 		router.replace({
@@ -118,17 +125,22 @@ export default function Page({ collectionItems: serverCollctionItems }) {
 								className={cardStyles.list_card}
 								style={{ margin: "0.5rem" }}
 							>
-								<div style={{ float: "right" }}>
-									<EditItemModal
-										item={item}
-										collectionName={collectionName}
-										callback={editItemCallback(collectionName, item)}
-									></EditItemModal>
-									<RemoveItemDialog
-										item={item}
-										collectionName={collectionName}
-										callback={cancelItemCallback(collectionName, item)}
-									></RemoveItemDialog>
+								<div className={`${flexStyles.flex} ${flexStyles.end}`}>
+									<div style={{ margin: "0 0.25rem" }}>
+										<EditItemModal
+											item={item}
+											collectionName={collectionName}
+											callback={editItemCallback(collectionName, item)}
+										></EditItemModal>
+									</div>
+
+									<div style={{ margin: "0 0.25rem" }}>
+										<RemoveItemDialog
+											item={item}
+											collectionName={collectionName}
+											callback={cancelItemCallback(collectionName, item)}
+										></RemoveItemDialog>
+									</div>
 								</div>
 								<dl className={listStyles.dl}>
 									<div>
@@ -140,7 +152,7 @@ export default function Page({ collectionItems: serverCollctionItems }) {
 										<dd>{item.description}</dd>
 									</div>
 								</dl>
-								<div style={{ float: "right" }}>
+								<div className={`${flexStyles.flex} ${flexStyles.end}`}>
 									<Stack direction="row" spacing={1}>
 										{item.tags?.map((tag) => (
 											<Chip
