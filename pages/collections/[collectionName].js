@@ -4,6 +4,7 @@ import Button from "@mui/material/Button";
 import RemoveItemDialog from "../../components/remove-item-dialog";
 import EditItemModal from "../../components/edit-item-modal";
 import SaveItemModal from "../../components/save-item-modal";
+import EditRecipesModal from "../../components/edit-recipes-modal";
 import SearchBar from "../../components/search-bar";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
@@ -20,7 +21,7 @@ import { useRouter } from "next/router";
 import { titleCase } from "../../utils/format";
 import {
 	getCollection,
-	cancelItem,
+	deleteItem,
 	editItem,
 	saveItem,
 } from "../../utils/collections-manager";
@@ -44,14 +45,15 @@ export default function Page({ collectionItems: serverCollctionItems }) {
 	const router = useRouter();
 	const collectionName = router.query.collectionName;
 	const currnetTags = router.query.tags ?? "";
+	const showRecipeScreens = collectionName === 'recipes'
 
-	console.log(collectionItems);
-
-	const cancelItemCallback = (collectionName, item) => async (doDelete) => {
+	const deleteItemCallback = (collectionName, item) => async (doDelete) => {
 		if (!doDelete) return;
 
-		return cancelItem(collectionName, item).then(() => {
-			return router.reload();
+		return deleteItem(collectionName, item).then(() => {
+			let shallowClone = [...collectionItems];
+			shallowClone.splice(collectionItems.indexOf(item), 1);
+			setCollectionItems(shallowClone);
 		});
 	};
 
@@ -98,6 +100,38 @@ export default function Page({ collectionItems: serverCollctionItems }) {
 		console.log(e.currentTarget.value);
 		console.log(e.currentTarget.checkValidity());
 	};
+
+	const renderItem = (item) => (
+		<dl className={listStyles.dl}>
+			<div>
+				<dt>Name</dt>
+				<dd>{item.name}</dd>
+			</div>
+			<div>
+				<dt>Description</dt>
+				<dd>{item.description}</dd>
+			</div>
+		</dl>
+	)
+
+	const renderRecipe = (recipe) => (
+		<dl className={listStyles.dl}>
+			<div>
+				<dt>Item</dt>
+				<dd>{recipe?.item.name}</dd>
+			</div>
+			<div>
+				<dt>Materials</dt>
+				<dd>
+					<ul className={listStyles.list_ul}>
+						{recipe?.materials.map((material) => (
+							<li key={`materials-${material._id}`}>{material.name}</li>
+						))}
+					</ul>
+				</dd>
+			</div>
+		</dl>
+	)
 
 	return (
 		<div className={pageStyles.container}>
@@ -148,31 +182,34 @@ export default function Page({ collectionItems: serverCollctionItems }) {
 							>
 								<div className={`${flexStyles.flex} ${flexStyles.end}`}>
 									<div style={{ margin: "0 0.25rem" }}>
-										<EditItemModal
-											item={item}
-											collectionName={collectionName}
-											callback={editItemCallback(collectionName, item)}
-										></EditItemModal>
+										{(showRecipeScreens)
+											? <EditRecipesModal
+												item={item}
+												collectionName={collectionName}
+												callback={editItemCallback(collectionName, item)}
+											/>
+											: <EditItemModal
+												item={item}
+												collectionName={collectionName}
+												callback={editItemCallback(collectionName, item)}
+											/>
+										}
 									</div>
 
 									<div style={{ margin: "0 0.25rem" }}>
 										<RemoveItemDialog
 											item={item}
 											collectionName={collectionName}
-											callback={cancelItemCallback(collectionName, item)}
+											callback={deleteItemCallback(collectionName, item)}
 										></RemoveItemDialog>
 									</div>
 								</div>
-								<dl className={listStyles.dl}>
-									<div>
-										<dt>Name</dt>
-										<dd>{item.name}</dd>
-									</div>
-									<div>
-										<dt>Description</dt>
-										<dd>{item.description}</dd>
-									</div>
-								</dl>
+								{
+									(showRecipeScreens)
+										? renderRecipe(item)
+										: renderItem(item)
+								}
+
 								<Stack
 									direction="row"
 									spacing={1}

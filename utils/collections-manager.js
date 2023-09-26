@@ -1,8 +1,19 @@
 import { getRequestFormat } from './format';
 
-const host = 'http://192.168.0.23:8080';
+const host = 'http://47.34.186.48:8080';
 
-export const cancelItem = async (collectionName, item) => {
+const stripRecipe = (recipe) => {
+	let delta = { ...recipe };
+	if (delta.materials) {
+		delta.materials = delta.materials.map(material => material._id);
+	}
+	if (delta.item) {
+		delta.item = delta.item._id;
+	}
+	return delta;
+}
+
+export const deleteItem = async (collectionName, item) => {
 	console.log("Delete Item", collectionName, item._id)
 	return fetch(`${host}/api/${collectionName}/${item._id}`, {
 		method: "DELETE"
@@ -11,6 +22,12 @@ export const cancelItem = async (collectionName, item) => {
 
 export const editItem = async (collectionName, item, delta) => {
 	console.log("Edit Item", collectionName, item._id, delta)
+
+	if (collectionName === 'recipes') {
+		item = stripRecipe(item);
+		delta = stripRecipe(delta);
+	}
+
 	let responce = await fetch(`${host}/api/${collectionName}/${item._id}`, {
 		method: "PUT",
 		headers: { 'Content-Type': 'application/json' },

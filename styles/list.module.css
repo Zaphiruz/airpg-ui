@@ -22,5 +22,13 @@
 
 .ul {
 	list-style-type: none;
+}
+
+.list_ul {
+	list-style-type: disc;
+}
+
+.ul,
+.list_ul {
 	padding-left: 0;
 }
