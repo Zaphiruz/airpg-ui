@@ -1,6 +1,6 @@
 import Head from "next/head";
-import RouterLink from '../components/router-link';
-import MainNav from '../components/main-nav';
+import RouterLink from "../components/router-link";
+import MainNav from "../components/main-nav";
 
 import pageStyles from "../styles/page.module.css";
 import cardStyles from "../styles/card.module.css";
@@ -8,7 +8,7 @@ import gridStyles from "../styles/grid.module.css";
 import footerStyles from "../styles/footer.module.css";
 import listStyles from "../styles/list.module.css";
 
-import { titleCase } from '../utils/format';
+import { titleCase } from "../utils/format";
 import { getCollectionNames } from "../utils/collections-manager";
 
 export const getServerSideProps = async () => {
@@ -21,9 +21,9 @@ export const getServerSideProps = async () => {
 	};
 };
 
-
 const makeCard = (collectionName) => (
-	<RouterLink href={`collections/${collectionName}`}
+	<RouterLink
+		href={`collections/${collectionName}`}
 		className={cardStyles.card}
 		key={collectionName}
 	>
@@ -36,29 +36,35 @@ const makeCard = (collectionName) => (
 
 export default function Home({ collectionNames }) {
 	return (
-		<div className={pageStyles.container}>
-			<Head>
-				<title>AI RPG Admin</title>
-				<link rel="icon" href="/favicon.ico" />
-			</Head>
-
+		<>
 			<MainNav collectionNames={collectionNames} />
 
-			<main className={`${pageStyles.main} ${pageStyles.main_center}`} style={{ padding: "5rem 0" }}>
-				<h1 className={pageStyles.title}>AIRPG Admin Interface</h1>
+			<div className={pageStyles.container}>
+				<Head>
+					<title>AI RPG Admin</title>
+					<link rel="icon" href="/favicon.ico" />
+				</Head>
+				<main
+					className={`${pageStyles.main} ${pageStyles.main_center}`}
+					style={{ padding: "5rem 0" }}
+				>
+					<h1 className={pageStyles.title}>AIRPG Admin Interface</h1>
 
-				<p className={pageStyles.description}>
-					Here, you can view, edit, delete, or create collections items!
-				</p>
+					<p className={pageStyles.description}>
+						Here, you can view, edit, delete, or create collections items!
+					</p>
 
-				<p className={pageStyles.subtext}>
-					Get started by clicking a category below.
-				</p>
+					<p className={pageStyles.subtext}>
+						Get started by clicking a category below.
+					</p>
 
-				<ul className={`${listStyles.ul} ${gridStyles.grid}`}>{collectionNames.map(makeCard)}</ul>
-			</main>
+					<ul className={`${listStyles.ul} ${gridStyles.grid}`}>
+						{collectionNames.map(makeCard)}
+					</ul>
+				</main>
 
-			<footer className={footerStyles.footer}></footer>
+				<footer className={footerStyles.footer}></footer>
+			</div>
 
 			<style jsx global>{`
 				html,
@@ -81,6 +87,6 @@ export default function Home({ collectionNames }) {
 						DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
 				}
 			`}</style>
-		</div>
+		</>
 	);
 }

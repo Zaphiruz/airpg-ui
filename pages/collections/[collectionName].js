@@ -1,6 +1,6 @@
 import Head from "next/head";
 import Button from "@mui/material/Button";
-import MainNav from '../../components/main-nav';
+import MainNav from "../../components/main-nav";
 import RemoveItemDialog from "../../components/remove-item-dialog";
 import EditItemModal from "../../components/edit-item-modal";
 import SaveItemModal from "../../components/save-item-modal";
@@ -18,7 +18,7 @@ import listStyles from "../../styles/list.module.css";
 import flexStyles from "../../styles/flex.module.css";
 
 import * as React from "react";
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { titleCase, getRequestFormat } from "../../utils/format";
 import {
 	getCollection,
@@ -29,15 +29,14 @@ import {
 } from "../../utils/collections-manager";
 
 export const getServerSideProps = async ({ params, query }) => {
-
 	let collectionNames = getCollectionNames();
 	let collectionItems = getCollection(params.collectionName, {
 		...query,
 		collectionName: undefined,
 	});
 
-	return Promise.all([collectionNames, collectionItems]).then(([collectionNames, collectionItems]) =>
-		({
+	return Promise.all([collectionNames, collectionItems]).then(
+		([collectionNames, collectionItems]) => ({
 			props: {
 				collectionName: params.collectionName,
 				collectionItems,
@@ -47,12 +46,16 @@ export const getServerSideProps = async ({ params, query }) => {
 	);
 };
 
-export default function Page({collectionItems, collectionName, collectionNames }) {
+export default function Page({
+	collectionItems,
+	collectionName,
+	collectionNames,
+}) {
 	const router = useRouter();
 	const query = Object.fromEntries(useSearchParams().entries());
 	const pathname = usePathname();
-	const currnetTags = query.tags ?? '';
-	const showRecipeScreens = collectionName === 'recipes';
+	const currnetTags = query.tags ?? "";
+	const showRecipeScreens = collectionName === "recipes";
 
 	const deleteItemCallback = (collectionName, item) => async (doDelete) => {
 		if (!doDelete) return;
@@ -109,7 +112,7 @@ export default function Page({collectionItems, collectionName, collectionNames }
 				<dd>{item.description}</dd>
 			</div>
 		</dl>
-	)
+	);
 
 	const renderRecipe = (recipe) => (
 		<dl className={listStyles.dl}>
@@ -128,120 +131,137 @@ export default function Page({collectionItems, collectionName, collectionNames }
 				</dd>
 			</div>
 		</dl>
-	)
+	);
 
-	return (<>
-		<MainNav collectionNames={collectionNames} />
+	return (
+		<>
+			<MainNav collectionNames={collectionNames} />
 
-		<div className={pageStyles.container}>
-			<Head>
-				<title>AI RPG {titleCase(collectionName)} Collection</title>
-				<link rel="icon" href="/favicon.ico" />
-			</Head>
+			<div className={pageStyles.container}>
+				<Head>
+					<title>AI RPG {titleCase(collectionName)} Collection</title>
+					<link rel="icon" href="/favicon.ico" />
+				</Head>
 
-			<main className={pageStyles.main}>
-				<h1 className={pageStyles.title}>
-					{titleCase(collectionName)} Collection
-				</h1>
-				<p className={pageStyles.description}>
-					Here, you can use basic CRUD opperations on{" "}
-					{titleCase(collectionName)} items
-				</p>
+				<main className={pageStyles.main}>
+					<h1 className={pageStyles.title}>
+						{titleCase(collectionName)} Collection
+					</h1>
+					<p className={pageStyles.description}>
+						Here, you can use basic CRUD opperations on{" "}
+						{titleCase(collectionName)} items
+					</p>
 
-				<SearchBar
-					searchCallback={searchCallback}
-					value={currnetTags}
-					disabled
-				/>
+					<SearchBar
+						searchCallback={searchCallback}
+						value={currnetTags}
+						disabled
+					/>
 
-				<section>
-					<div
-						className={`${flexStyles.flex} ${flexStyles.space_between} ${flexStyles.centered}`}
-						style={{ marginTop: "1rem" }}
-					>
-						<Button
-							variant="outlined"
-							color="secondary"
-							startIcon={<ClearIcon />}
-							onClick={() => clearTags(collectionName)}
+					<section>
+						<div
+							className={`${flexStyles.flex} ${flexStyles.space_between} ${flexStyles.centered}`}
+							style={{ marginTop: "1rem" }}
 						>
-							Clear Search
-						</Button>
-						{
-						(showRecipeScreens)
-							? <SaveRecipesModal
-								collectionName={collectionName}
-								callback={saveItemCallback(collectionName)}
-							/>
-							: <SaveItemModal
-								collectionName={collectionName}
-								callback={saveItemCallback(collectionName)}
-							/>
-						}
-
-					</div>
-
-					<ul className={listStyles.ul}>
-						{collectionItems?.map((item) => (
-							<li
-								key={item._id}
-								className={cardStyles.list_card}
+							<Button
+								variant="outlined"
+								color="secondary"
+								startIcon={<ClearIcon />}
+								onClick={() => clearTags(collectionName)}
 							>
-								<div className={`${flexStyles.flex} ${flexStyles.end}`}>
-									<div style={{ margin: "0 0.25rem" }}>
-										{(showRecipeScreens)
-											? <EditRecipesModal
+								Clear Search
+							</Button>
+							{showRecipeScreens ? (
+								<SaveRecipesModal
+									collectionName={collectionName}
+									callback={saveItemCallback(collectionName)}
+								/>
+							) : (
+								<SaveItemModal
+									collectionName={collectionName}
+									callback={saveItemCallback(collectionName)}
+								/>
+							)}
+						</div>
+
+						<ul className={listStyles.ul}>
+							{collectionItems?.map((item) => (
+								<li key={item._id} className={cardStyles.list_card}>
+									<div className={`${flexStyles.flex} ${flexStyles.end}`}>
+										<div style={{ margin: "0 0.25rem" }}>
+											{showRecipeScreens ? (
+												<EditRecipesModal
+													item={item}
+													collectionName={collectionName}
+													callback={editItemCallback(collectionName, item)}
+												/>
+											) : (
+												<EditItemModal
+													item={item}
+													collectionName={collectionName}
+													callback={editItemCallback(collectionName, item)}
+												/>
+											)}
+										</div>
+
+										<div style={{ margin: "0 0.25rem" }}>
+											<RemoveItemDialog
 												item={item}
 												collectionName={collectionName}
-												callback={editItemCallback(collectionName, item)}
-											/>
-											: <EditItemModal
-												item={item}
-												collectionName={collectionName}
-												callback={editItemCallback(collectionName, item)}
-											/>
-										}
+												callback={deleteItemCallback(collectionName, item)}
+											></RemoveItemDialog>
+										</div>
 									</div>
+									{showRecipeScreens ? renderRecipe(item) : renderItem(item)}
 
-									<div style={{ margin: "0 0.25rem" }}>
-										<RemoveItemDialog
-											item={item}
-											collectionName={collectionName}
-											callback={deleteItemCallback(collectionName, item)}
-										></RemoveItemDialog>
-									</div>
-								</div>
-								{
-									(showRecipeScreens)
-										? renderRecipe(item)
-										: renderItem(item)
-								}
+									<Stack
+										direction="row"
+										spacing={1}
+										justifyContent="flex-end"
+										alignItems="center"
+										flexWrap="wrap"
+										useFlexGap
+									>
+										{item.tags?.map((tag) => (
+											<Chip
+												key={`${item._id}-${tag}-tag`}
+												label={tag}
+												onClick={() => searchTags(tag, collectionName)}
+												size="small"
+												variant="outlined"
+											/>
+										)) ?? "None"}
+									</Stack>
+								</li>
+							))}
+						</ul>
+					</section>
+				</main>
 
-								<Stack
-									direction="row"
-									spacing={1}
-									justifyContent="flex-end"
-									alignItems="center"
-									flexWrap="wrap"
-									useFlexGap
-								>
-									{item.tags?.map((tag) => (
-										<Chip
-											key={`${item._id}-${tag}-tag`}
-											label={tag}
-											onClick={() => searchTags(tag, collectionName)}
-											size="small"
-											variant="outlined"
-										/>
-									)) ?? "None"}
-								</Stack>
-							</li>
-						))}
-					</ul>
-				</section>
-			</main>
+				<footer className={footerStyles.footer}></footer>
+			</div>
 
-			<footer className={footerStyles.footer}></footer>
-		</div>
-	</>);
+			<style jsx global>{`
+				html,
+				body {
+					padding: 0;
+					margin: 0;
+					font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
+						Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
+						sans-serif;
+				}
+				* {
+					box-sizing: border-box;
+				}
+				code {
+					background: #fafafa;
+					border-radius: 5px;
+					padding: 0.75rem;
+					font-size: 1.1rem;
+					font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
+						DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
+				}
+			`}</style>
+		</>
+	);
 }
