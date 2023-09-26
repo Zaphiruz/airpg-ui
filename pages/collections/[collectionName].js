@@ -17,8 +17,8 @@ import listStyles from "../../styles/list.module.css";
 import flexStyles from "../../styles/flex.module.css";
 
 import * as React from "react";
-import { useRouter } from "next/router";
-import { titleCase } from "../../utils/format";
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { titleCase, getRequestFormat } from "../../utils/format";
 import {
 	getCollection,
 	deleteItem,
@@ -27,6 +27,7 @@ import {
 } from "../../utils/collections-manager";
 
 export const getServerSideProps = async ({ params, query }) => {
+
 	let collectionItems = await getCollection(params.collectionName, {
 		...query,
 		collectionName: undefined,
@@ -34,26 +35,24 @@ export const getServerSideProps = async ({ params, query }) => {
 
 	return {
 		props: {
+			collectionName: params.collectionName,
 			collectionItems,
 		},
 	};
 };
 
-export default function Page({ collectionItems: serverCollctionItems }) {
-	const [collectionItems, setCollectionItems] =
-		React.useState(serverCollctionItems);
+export default function Page({collectionItems, collectionName }) {
 	const router = useRouter();
-	const collectionName = router.query.collectionName;
-	const currnetTags = router.query.tags ?? "";
-	const showRecipeScreens = collectionName === 'recipes'
+	const query = Object.fromEntries(useSearchParams().entries());
+	const pathname = usePathname();
+	const currnetTags = query.tags ?? '';
+	const showRecipeScreens = collectionName === 'recipes';
 
 	const deleteItemCallback = (collectionName, item) => async (doDelete) => {
 		if (!doDelete) return;
 
 		return deleteItem(collectionName, item).then(() => {
-			let shallowClone = [...collectionItems];
-			shallowClone.splice(collectionItems.indexOf(item), 1);
-			setCollectionItems(shallowClone);
+			router.replace(getRequestFormat(pathname, query));
 		});
 	};
 
@@ -64,9 +63,7 @@ export default function Page({ collectionItems: serverCollctionItems }) {
 			return editItem(collectionName, item, delta).then((newItem) => {
 				if (newItem) {
 					callback();
-					let shallowClone = [...collectionItems];
-					shallowClone.splice(collectionItems.indexOf(item), 1, newItem);
-					setCollectionItems(shallowClone);
+					router.replace(getRequestFormat(pathname, query));
 				}
 			});
 		};
@@ -77,23 +74,17 @@ export default function Page({ collectionItems: serverCollctionItems }) {
 		return saveItem(collectionName, item).then((newItem) => {
 			if (newItem) {
 				callback();
-				setCollectionItems([...collectionItems, newItem]);
+				router.replace(getRequestFormat(pathname, query));
 			}
 		});
 	};
 
 	const searchTags = (tags, collectionName) => {
-		router.replace({
-			pathname: `/collections/${collectionName}`,
-			query: { tags },
-		});
+		router.replace(getRequestFormat(pathname, { tags }));
 	};
 
 	const clearTags = (collectionName) => {
-		router.replace({
-			pathname: `/collections/${collectionName}`,
-			query: {},
-		});
+		router.replace(pathname);
 	};
 
 	const searchCallback = (e) => {
