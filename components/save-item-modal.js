@@ -25,9 +25,9 @@ const style = {
 	p: 4,
 };
 
-export default ({ item, collectionName, callback }) => {
+export default ({ collectionName, callback }) => {
 	const [open, setOpen] = React.useState(false);
-	const [delta, setDelta] = React.useState({});
+	const [item, setItem] = React.useState({ name: "", description: "", tags: [] });
 	const [dirty, setDirty] = React.useState(false);
 	const handleOpen = () => {
 		setOpen(true);
@@ -38,50 +38,52 @@ export default ({ item, collectionName, callback }) => {
 		clearRecord();
 	};
 
-	function applyDelta(key, value) {
+	function applyItem(key, value) {
 		setDirty(true);
 
-		setDelta({
-			...delta,
+		setItem({
+			...item,
 			[key]: value,
 		});
 	}
 
 	function removeTags(tag) {
-		let tags = delta.tags ?? item.tags;
-		let clone = [...tags];
-
+		let clone = [...(item.tags ?? [])];
 		clone.splice(tags.indexOf(tag), 1);
 
-		return applyDelta("tags", clone);
+		return applyItem("tags", clone);
 	}
 
 	function addTag(newTag) {
-		let clone = new Set([...item.tags, ...(delta.tags ?? []), newTag.toUpperCase()]);
-		return applyDelta("tags", Array.from(clone));
+		let clone = new Set([...(item.tags ?? []), newTag.toUpperCase()]);
+		return applyItem("tags", Array.from(clone));
 	}
 
-	const saveRecord = async (delta) => {
-		await callback(delta, () => handleClose());
+	const saveRecord = async (item) => {
+		await callback(item, () => handleClose());
 	};
 
 	const clearRecord = () => {
 		setDirty(false);
 
-		setDelta({});
+		setItem({});
 	};
 
 	return (
-		<div>
-			<Button
-				variant="outlined"
-				color="primary"
-				size="small"
-				startIcon={<EditIcon />}
-				onClick={handleOpen}
-			>
-				Edit
-			</Button>
+		<div style={{ marginTop: "1rem" }} >
+			<div className={`${flexStyles.flex} ${flexStyles.end}`}>
+				<Button
+					variant="outlined"
+					color="success"
+					size="large"
+					startIcon={<AddCircleOutlineIcon />}
+					onClick={handleOpen}
+					xs={{ marginRight: "auto" }}
+				>
+					New {collectionName}
+				</Button>
+			</div>
+
 			<Modal
 				open={open}
 				onClose={handleClose}
@@ -90,7 +92,7 @@ export default ({ item, collectionName, callback }) => {
 			>
 				<Box sx={style}>
 					<Typography id="modal-modal-title" variant="h6" component="h2">
-						Edit <strong>{item.name}</strong>
+						New <strong>{collectionName}</strong>
 					</Typography>
 
 					<form>
@@ -101,8 +103,8 @@ export default ({ item, collectionName, callback }) => {
 							<OutlinedInput
 								placeholder="Please enter a name"
 								id="name"
-								value={delta.name ?? item.name}
-								onChange={(e) => applyDelta("name", e.currentTarget.value)}
+								value={item.name}
+								onChange={(e) => applyItem("name", e.currentTarget.value)}
 							/>
 						</FormControl>
 						<FormControl fullWidth sx={{ margin: "0.5rem 0" }}>
@@ -111,9 +113,9 @@ export default ({ item, collectionName, callback }) => {
 								label="Description"
 								multiline
 								rows={4}
-								value={delta.description ?? item.description}
+								value={item.description}
 								onChange={(e) =>
-									applyDelta("description", e.currentTarget.value)
+									applyItem("description", e.currentTarget.value)
 								}
 							/>
 						</FormControl>
@@ -124,9 +126,9 @@ export default ({ item, collectionName, callback }) => {
 							</div>
 
 							<div>
-								{(delta.tags ?? item.tags)?.map((tag) => (
+								{item.tags?.map((tag) => (
 									<Chip
-										key={`edit-${item._id}-${tag}-tag`}
+										key={`new-item-${tag}-tag`}
 										label={tag}
 										size="small"
 										variant="outlined"
@@ -152,7 +154,7 @@ export default ({ item, collectionName, callback }) => {
 							<Button
 								variant="outlined"
 								color="success"
-								onClick={() => saveRecord(delta)}
+								onClick={() => saveRecord(item)}
 								disabled={!dirty}
 								sx={{ margin: "0.5rem" }}
 							>
@@ -190,7 +192,7 @@ function TagModal({ item, callback }) {
 	return (
 		<React.Fragment>
 			<Chip
-				key={`edit-${item._id}-new-tag`}
+				key={`new-item-new-tag`}
 				label="New Tag"
 				size="small"
 				variant="outlined"

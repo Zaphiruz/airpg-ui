@@ -22,6 +22,16 @@ export const editItem = async (collectionName, item, delta) => {
 	return responce.json();
 }
 
+export const saveItem = async (collectionName, item) => {
+	console.log("New Item", collectionName, item);
+	let responce = await fetch(`${host}/api/${collectionName}`, {
+		method: "POST",
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(item)
+	});
+	return responce.json();
+}
+
 export const getCollection = async (collectionName, query) => {
 	console.log("Get Colleciton", collectionName);
 	let responce = await fetch(

@@ -3,6 +3,7 @@ import Button from "@mui/material/Button";
 
 import RemoveItemDialog from "../../components/remove-item-dialog";
 import EditItemModal from "../../components/edit-item-modal";
+import SaveItemModal from "../../components/save-item-modal";
 import SearchBar from "../../components/search-bar";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
@@ -21,6 +22,7 @@ import {
 	getCollection,
 	cancelItem,
 	editItem,
+	saveItem,
 } from "../../utils/collections-manager";
 
 export const getServerSideProps = async ({ params, query }) => {
@@ -66,6 +68,17 @@ export default function Page({ collectionItems: serverCollctionItems }) {
 				}
 			});
 		};
+
+	const saveItemCallback = (collectionName) => async (item, callback) => {
+		if (!item) return;
+
+		return saveItem(collectionName, item).then((newItem) => {
+			if (newItem) {
+				callback();
+				setCollectionItems([...collectionItems, newItem]);
+			}
+		});
+	}
 
 	const searchTags = (tags, collectionName) => {
 		router.replace({
@@ -118,6 +131,8 @@ export default function Page({ collectionItems: serverCollctionItems }) {
 				</Button>
 
 				<section>
+					<SaveItemModal collectionName={collectionName} callback={saveItemCallback(collectionName)}/>
+
 					<ul className={listStyles.ui}>
 						{collectionItems?.map((item) => (
 							<li
