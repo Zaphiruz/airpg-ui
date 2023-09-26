@@ -1,3 +1,5 @@
+import { getRequestFormat } from './format';
+
 const host = 'http://127.0.0.1:8080';
 
 export const cancelItem = async (collectionName, item) => {
@@ -7,16 +9,10 @@ export const cancelItem = async (collectionName, item) => {
 	})
 }
 
-export const cancelItemHandler = (collectionName, item) => async (doDelete) => {
-	if (!doDelete) return;
-
-	return cancelItem(collectionName, item);
-}
-
-export const getCollection = async (collectionName) => {
+export const getCollection = async (collectionName, query) => {
 	console.log("Get Colleciton", collectionName);
 	let responce = await fetch(
-		`${host}/api/${collectionName}`
+		getRequestFormat(`${host}/api/${collectionName}`, query)
 	);
 	return responce.json();
 }

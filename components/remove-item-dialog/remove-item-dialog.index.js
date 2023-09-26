@@ -7,7 +7,12 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-export const RemoveItemDialog = ({ children, item, collectionName, callback }) => {
+export const RemoveItemDialog = ({
+	children,
+	item,
+	collectionName,
+	callback,
+}) => {
 	const [open, setOpen] = React.useState(false);
 
 	const handleClickOpen = () => {
@@ -21,16 +26,22 @@ export const RemoveItemDialog = ({ children, item, collectionName, callback }) =
 	const success = () => {
 		handleClose();
 		callback?.(true);
-	}
+	};
 
 	const cancel = () => {
 		handleClose();
 		callback?.(false);
-	}
+	};
 
 	return (
 		<div>
-			<Button variant="outlined" color='error' onClick={handleClickOpen} startIcon={<DeleteIcon />}>
+			<Button
+				variant="outlined"
+				color="error"
+				size="small"
+				onClick={handleClickOpen}
+				startIcon={<DeleteIcon />}
+			>
 				Delete
 			</Button>
 			<Dialog
