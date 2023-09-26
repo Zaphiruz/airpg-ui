@@ -5,6 +5,7 @@ import RemoveItemDialog from "../../components/remove-item-dialog";
 import EditItemModal from "../../components/edit-item-modal";
 import SaveItemModal from "../../components/save-item-modal";
 import EditRecipesModal from "../../components/edit-recipes-modal";
+import SaveRecipesModal from "../../components/save-recipes-modal";
 import SearchBar from "../../components/search-bar";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
@@ -159,10 +160,18 @@ export default function Page({collectionItems, collectionName }) {
 						>
 							Clear Search
 						</Button>
-						<SaveItemModal
-							collectionName={collectionName}
-							callback={saveItemCallback(collectionName)}
-						/>
+						{
+						(showRecipeScreens)
+							? <SaveRecipesModal
+								collectionName={collectionName}
+								callback={saveItemCallback(collectionName)}
+							/>
+							: <SaveItemModal
+								collectionName={collectionName}
+								callback={saveItemCallback(collectionName)}
+							/>
+						}
+
 					</div>
 
 					<ul className={listStyles.ul}>

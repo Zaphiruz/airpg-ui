@@ -1,18 +1,25 @@
-import * as React from "react";
+
 import Modal from "@mui/material/Modal";
 import EditIcon from "@mui/icons-material/Edit";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import FormControl from "@mui/material/FormControl";
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 import InputLabel from "@mui/material/InputLabel";
+import ListItemText from "@mui/material/ListItemText";
 import OutlinedInput from "@mui/material/OutlinedInput";
-import TextField from "@mui/material/TextField";
+import Checkbox from "@mui/material/Checkbox";
 import Chip from "@mui/material/Chip";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import RouterLink from '../components/router-link';
 
 import flexStyles from "../styles/flex.module.css";
+
+import * as React from "react";
+import { getCollection } from "../utils/collections-manager";
 
 const style = {
 	position: "absolute",
@@ -26,8 +33,15 @@ const style = {
 
 export default ({ collectionName, callback }) => {
 	const [open, setOpen] = React.useState(false);
-	const [item, setItem] = React.useState({ name: "", description: "", tags: [] });
+	const [recipe, setRecipe] = React.useState({ item: {}, materials: [], tags: [] });
 	const [dirty, setDirty] = React.useState(false);
+	const [itemsCollection, setItemsCollection] = React.useState([]);
+
+	React.useEffect(() => {
+		getCollection('items')
+			.then(setItemsCollection)
+	}, [])
+
 	const handleOpen = () => {
 		setOpen(true);
 		clearRecord();
@@ -37,96 +51,126 @@ export default ({ collectionName, callback }) => {
 		clearRecord();
 	};
 
-	function applyItem(key, value) {
+	function applyRecipe(key, value) {
 		setDirty(true);
 
-		setItem({
-			...item,
+		setRecipe({
+			...recipe,
 			[key]: value,
 		});
 	}
 
 	function removeTags(tag) {
-		let clone = [...(item.tags ?? [])];
+		let clone = [...recipe.tags];
 		clone.splice(tags.indexOf(tag), 1);
-
-		return applyItem("tags", clone);
+		return applyRecipe("tags", clone);
 	}
 
 	function addTag(newTag) {
-		let clone = new Set([...(item.tags ?? []), newTag.toUpperCase()]);
-		return applyItem("tags", Array.from(clone));
+		let clone = new Set([
+			...recipe.tags,
+			newTag.toUpperCase(),
+		]);
+		return applyRecipe("tags", Array.from(clone));
 	}
 
-	const saveRecord = async (item) => {
-		await callback(item, () => handleClose());
+	const saveRecord = async (recipe) => {
+		await callback(recipe, () => handleClose());
 	};
 
 	const clearRecord = () => {
 		setDirty(false);
 
-		setItem({ name: "", description: "", tags: [] });
+		setRecipe({ item: {}, materials: [], tags: [] });
 	};
 
 	return (
 		<div>
-			<div className={`${flexStyles.flex} ${flexStyles.end}`}>
-				<Button
-					variant="outlined"
-					color="success"
-					startIcon={<AddCircleOutlineIcon />}
-					onClick={handleOpen}
-					xs={{ marginRight: "auto" }}
-				>
-					New {collectionName}
-				</Button>
-			</div>
-
+			<Button
+				variant="outlined"
+				color="primary"
+				size="small"
+				startIcon={<EditIcon />}
+				onClick={handleOpen}
+			>
+				New Recipes
+			</Button>
 			<Modal
 				open={open}
 				onClose={handleClose}
+				size="large"
 				aria-labelledby="modal-modal-title"
 				aria-describedby="modal-modal-description"
 			>
 				<Box sx={style}>
 					<Typography id="modal-modal-title" variant="h6" component="h2">
-						New <strong>{collectionName}</strong>
+						New <strong>Recipe</strong>
+					</Typography>
+
+					<Typography id="modal-modal-title" component="p">
+						<strong>Note:</strong> Items must exist to add new recipes for them.
+						<RouterLink href={`items`} >Please go there first if needed.</RouterLink>
 					</Typography>
 
 					<form>
-						<FormControl sx={{ width: "25ch", margin: "0.5rem 0" }}>
-							<InputLabel sx={{ background: "white" }} htmlFor="name">
-								Name
-							</InputLabel>
-							<OutlinedInput
-								placeholder="Please enter a name"
-								id="name"
-								value={item.name}
-								onChange={(e) => applyItem("name", e.currentTarget.value)}
-							/>
+						<FormControl fullWidth sx={{ margin: "1rem 0" }}>
+							<InputLabel id={`edit-${recipe._id}-item`}>Item</InputLabel>
+							<Select
+								labelId={`edit-${recipe._id}-item`}
+								id={`edit-${recipe._id}-item-select`}
+								label="Item"
+								value={itemsCollection.find(item => item._id === recipe.item._id)}
+								onChange={(e) => {
+									applyRecipe("item", e.target.value);
+								}}
+							>
+								{itemsCollection?.map(item => (
+									<MenuItem key={`edit-${recipe._id}-items-select-${item._id}`} value={item}>{item.name}</MenuItem>
+								))}
+							</Select>
 						</FormControl>
-						<FormControl fullWidth sx={{ margin: "0.5rem 0" }}>
-							<TextField
-								id="description"
-								label="Description"
-								multiline
-								rows={4}
-								value={item.description}
-								onChange={(e) =>
-									applyItem("description", e.currentTarget.value)
-								}
-							/>
+
+						<FormControl fullWidth sx={{ margin: "1rem 0" }}>
+							<InputLabel id={`edit-${recipe._id}-materials`} sx={{ backgroundColor: 'white', padding: '0 0.3rem' }}>Materials</InputLabel>
+							<Select
+								labelId={`edit-${recipe._id}-materials`}
+								id={`edit-${recipe._id}-materials-select`}
+								multiple
+								value={ recipe.materials.map(item => item._id).reduce((c, v) => {
+									let material = itemsCollection.find(material => material._id === v);
+									if (material) {
+										c.push(material);
+									}
+									return c;
+								}, []) ?? []}
+								onChange={(e) => {applyRecipe("materials", e.target.value)}}
+								input={<OutlinedInput label="Tag" />}
+								renderValue={(selected) => (
+									<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+									  {selected.map((material) => (
+										<Chip key={`edit-${recipe._id}-materials-select-${material._id}`} label={material.name} />
+									  ))}
+									</Box>
+								  )}
+							>
+								{itemsCollection.map((material) => (
+									<MenuItem key={material._id} value={material}>
+										<Checkbox checked={!!recipe.materials.find(item => material._id === item._id)} />
+										<ListItemText primary={material.name} />
+									</MenuItem>
+								))}
+							</Select>
 						</FormControl>
 
 						<div className={`${flexStyles.flex} ${flexStyles.space_between}`}>
 							<div>
-								<TagModal item={item} callback={addTag}></TagModal>
+								<TagModal item={recipe} callback={addTag}></TagModal>
 							</div>
 
 							<div>
-								{item.tags?.map((tag) => (
+								{recipe.tags?.map((tag) => (
 									<Chip
-										key={`new-item-${tag}-tag`}
+										key={`edit-${recipe._id}-${tag}-tag`}
 										label={tag}
 										size="small"
 										variant="outlined"
@@ -152,7 +196,7 @@ export default ({ collectionName, callback }) => {
 							<Button
 								variant="outlined"
 								color="success"
-								onClick={() => saveRecord(item)}
+								onClick={() => saveRecord(recipe)}
 								disabled={!dirty}
 								sx={{ margin: "0.5rem" }}
 							>
@@ -190,7 +234,7 @@ function TagModal({ item, callback }) {
 	return (
 		<React.Fragment>
 			<Chip
-				key={`new-item-new-tag`}
+				key={`edit-${item._id}-new-tag`}
 				label="New Tag"
 				size="small"
 				variant="outlined"
@@ -243,4 +287,4 @@ function TagModal({ item, callback }) {
 			</Modal>
 		</React.Fragment>
 	);
-}
+};
